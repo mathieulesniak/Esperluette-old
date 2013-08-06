@@ -27,6 +27,7 @@ class Fwk
 
     private $servicesList = array(
         'Logger'            => '\Fwk\Logger',
+        'App'               => '\Fwk\App',
         'Router'            => '\Fwk\Router',
         'Request'           => '\Fwk\Request',
         'Database'          => '\Fwk\Database',
@@ -209,6 +210,8 @@ class Fwk
         }
         static::$servicesContainer['Router']->doRouting();
     }
+
+
 
    
     public static function __callStatic($name, $arguments)
