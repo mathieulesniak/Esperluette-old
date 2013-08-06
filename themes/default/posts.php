@@ -1,1 +1,6 @@
-POST LIST
+
+<?php while (posts()) { ?>
+	blabal
+	<?= postTitle() ?>
+	blabla
+<?php } ?>

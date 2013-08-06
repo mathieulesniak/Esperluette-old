@@ -1,9 +1,9 @@
 <?php themeInclude('header'); ?>
 
 <section class="post">
-    <h1>Article TITLE</h1>
+    <h1><?= postTitle(); ?></h1>
     <article>
-        ZE POST
+        <?= postContent(); ?>
     </article>
 </section>
 
