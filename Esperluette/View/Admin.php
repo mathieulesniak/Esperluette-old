@@ -12,8 +12,11 @@ class Admin extends \Fwk\Page
 
     private $sections = array(
         'posts'         => array('name' => 'admin.posts', 'accessLevel' => 'editor', 'url' => '/admin/posts'),
+        'pages'         => array('name' => 'admin.pages', 'accessLevel' => 'editor', 'url' => '/admin/pages'),
         'comments'      => array('name' => 'admin.comments', 'accessLevel' => 'user', 'url' => '/admin/comments'),
-        'categories'    => array('name' => 'admin.categories', 'accessLevel' => 'editor', 'url' => '/admin/categories')
+        'categories'    => array('name' => 'admin.categories', 'accessLevel' => 'editor', 'url' => '/admin/categories'),
+        'users'         => array('name' => 'admin.users', 'accessLevel' => 'admin', 'url' => '/admin/users'),
+        'setup'         => array('name' => 'admin.setup', 'accessLevel' => 'admin', 'url' => '/admin/congfigure')
     );
     private $section;
 
@@ -54,7 +57,7 @@ class Admin extends \Fwk\Page
         foreach ($this->sections as $sectionId => $sectionData) {
             $class = ($this->section == $sectionId) ? ' class="selected"' : '';
             $output .= '<li ' . $class . '>';
-            $output .= '    <a href="' . $sectionData['url'] . '">' . Helper::i18n($sectionData['name'])  . '</a>';
+            $output .= '    <a href="' . Helper::url($sectionData['url']) . '">' . Helper::i18n($sectionData['name'])  . '</a>';
             $output .= '</li>'."\n";
         }
         $output .= '</ul>'."\n";
