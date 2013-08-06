@@ -45,4 +45,9 @@ class Helper
             }
         }
     }
+
+    public static function url($url)
+    {
+        return Fwk::App()->getParameter('url') . $url;
+    }
 }
