@@ -27,12 +27,11 @@ header UL LI {
 
 }
 
-.postlist LI {
+.postlist A {
+    display: block;
+    padding: 20px;
     border-bottom: solid 1px #CCC;
-    padding: 10px;
 }
-
-
 
 #post-preview {
     position: absolute;
@@ -53,5 +52,6 @@ header UL LI {
     position: absolute;
     top: 50px;
     bottom: 0;
-    width: 100%;
+    
+    padding: 10px;
 }
