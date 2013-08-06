@@ -118,13 +118,7 @@ class Post extends \Fwk\DBObject
 
     public function getURL()
     {
-        return sprintf(
-            '/%s/%s/%s-%s',
-            date('Y', strtotime($this->date)),
-            date('m', strtotime($this->date)),
-            $this->id,
-            Model\Utils::title2url($this->title)
-        );
+        
     }
 
     public function getStatus()
