@@ -3,10 +3,13 @@ namespace Esperluette\View;
 
 use Esperluette\Model\Helper;
 use Esperluette\Model\Notification;
+use Fwk\Fwk;
 
 class Admin extends \Fwk\Page
 {
     protected $model;
+    protected $removeTemplate = false;
+
     private $sections = array(
         'posts'         => array('name' => 'admin.posts', 'accessLevel' => 'editor', 'url' => '/admin/posts'),
         'comments'      => array('name' => 'admin.comments', 'accessLevel' => 'user', 'url' => '/admin/comments'),
@@ -21,9 +24,25 @@ class Admin extends \Fwk\Page
         /**
         TODO : handle stylesheet + scripts
          */
-        $this->addStylesheet('bootstrap', '/style/bootstrap.min.css');
+        $this->addStylesheet(
+            'admin',
+            Fwk::App()->getParameter('url') . '/'
+            . Fwk::App()->getParameter('root')
+            . '/View/Assets/css/admin.css'
+        );
 
-        $this->addScript('zepto', '/script/jquery.min.js');
+        $this->addScript(
+            'zepto',
+            Fwk::App()->getParameter('url') . '/'
+            . Fwk::App()->getParameter('root')
+            . '/View/Assets/scripts/zepto.min.js'
+        );
+        $this->addScript(
+            'admin',
+            Fwk::App()->getParameter('url') . '/'
+            . Fwk::App()->getParameter('root')
+            . '/View/Assets/scripts/admin.js');
+
     }
 
     private function renderNavigation()
@@ -45,13 +64,17 @@ class Admin extends \Fwk\Page
 
     public function render($content = '')
     {
-        $output  = '<header>'."\n";
-        $output .=      $this->renderNavigation();
-        $output .= '</header>' ."\n";
+        $output = '';
 
-        $notifications = Notification::read();
-        if ($notifications !== '') {
-            // Output notifications
+        if (!$this->removeTemplate) {
+            $output  = '<header>'."\n";
+            $output .=      $this->renderNavigation();
+            $output .= '</header>' ."\n";
+
+            $notifications = Notification::read();
+            if ($notifications !== '') {
+                // Output notifications
+            }
         }
 
 

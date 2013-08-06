@@ -29,6 +29,20 @@ class Post extends \Esperluette\Controller\Base
         $this->response->setBody($view->render());
     }
 
+    public function previewPost($postId)
+    {
+        if ($postId != '') {
+            $model = new Model\Blog\Post();
+            $model->load($postId);
+
+            if ($model->id !== null) {
+                $view = new View\Admin\PostPreview($model);
+            }
+        }
+
+        $this->response->setBody($view->render());
+    }
+
     public function editPost($postId)
     {
         echo 'TOTOT';

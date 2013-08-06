@@ -14,7 +14,7 @@ class PostHomepage extends \Esperluette\View\Admin
         $output = '<ul class="postlist">'."\n";
         foreach ($this->model as $currentPost) {
             $output .= '<li>';
-            $output .= '    <a href="#">';
+            $output .= '    <a href="#" onclick="adminPreviewPost(\'' . htmlentities($currentPost->id) . '\'); return false">';
             $output .= '        <div class="title">' . htmlentities($currentPost->title, ENT_COMPAT, 'UTF-8') . '</div>';
             $output .= '        <time>NICE TIME GOES HERE</time>';
             $output .= '        <div class="status">' . Helper::i18n('post.status.' . $currentPost->getStatus()) . '</div>'."\n";
@@ -23,6 +23,7 @@ class PostHomepage extends \Esperluette\View\Admin
         }
 
         $output .= '</ul>'."\n";
+        $output .= '<div id="post-preview"></div>';
         return parent::render($output);
     }
 }
