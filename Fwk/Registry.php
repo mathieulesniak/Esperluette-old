@@ -3,7 +3,7 @@ namespace Fwk;
 
 class Registry
 {
-    public static $data = array();
+    protected static $data = array();
     protected static $context;
 
     public static function get($key, $defaultValue = null)
