@@ -16,9 +16,9 @@ class Admin extends \Fwk\Page
         'comments'      => array('name' => 'admin.comments', 'accessLevel' => 'user', 'url' => '/admin/comments'),
         'categories'    => array('name' => 'admin.categories', 'accessLevel' => 'editor', 'url' => '/admin/categories'),
         'users'         => array('name' => 'admin.users', 'accessLevel' => 'admin', 'url' => '/admin/users'),
-        'setup'         => array('name' => 'admin.setup', 'accessLevel' => 'admin', 'url' => '/admin/congfigure')
+        'setup'         => array('name' => 'admin.setup', 'accessLevel' => 'admin', 'url' => '/admin/configure')
     );
-    private $section;
+    protected $section;
 
     public function __construct(&$model = null)
     {
@@ -56,7 +56,7 @@ class Admin extends \Fwk\Page
         $output = '<ul>'."\n";
         foreach ($this->sections as $sectionId => $sectionData) {
             $class = ($this->section == $sectionId) ? ' class="selected"' : '';
-            $output .= '<li ' . $class . '>';
+            $output .= '<li' . $class . '>';
             $output .= '    <a href="' . Helper::url($sectionData['url']) . '">' . Helper::i18n($sectionData['name'])  . '</a>';
             $output .= '</li>'."\n";
         }
