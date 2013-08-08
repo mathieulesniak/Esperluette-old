@@ -18,8 +18,9 @@ class Esperluette
         require_once 'TemplateFunctions.php';
     }
 
-    private function loadConfig()
+    public function loadConfig()
     {
+        Config::clean();
         $metaList   = Meta\MetaList::loadAll();
 
         foreach ($metaList as $currentMeta) {
