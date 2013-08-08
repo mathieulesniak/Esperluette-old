@@ -21,7 +21,10 @@ class FormItem
                                     'multiple',
                                     'autocomplete',
                                     'required',
-                                    'pattern'
+                                    'pattern',
+                                    'min',
+                                    'step',
+                                    'max'
                                 );
     public $label;
     public $objectHtmlValues            = array();
@@ -84,14 +87,23 @@ class FormItem
         return static::input('password', $name, $value, $label, $htmlAttributes);
     }
 
+    public static function number($name, $value, $label = null, $htmlAttributes = array())
+    {
+        return static::input('number', $name, $value, $label, $htmlAttributes);
+    }
+
     public static function button($name, $value, $label = null, $htmlAttributes = array())
     {
         return static::input('button', $name, $value, $label, $htmlAttributes);
     }
 
-    public static function checkbox()
+    public static function checkbox($name, $value = 1, $checked = false, $label = null, $htmlAttributes = array()) 
     {
-
+        if (isset($attributes['checked']) && $checked) {
+            $attributes['checked'] = 'checked';
+        }
+        
+        return static::input('checkbox', $name, $value, $label, $htmlAttributes);
     }
 
     public static function file($name, $value, $label = null, $htmlAttributes = array())
@@ -121,7 +133,7 @@ class FormItem
         return static::input('reset', null, $value, $label, $htmlAttributes);
     }
 
-    public static function select($name, $availableValues = array(), $value = null, $label = null, $htmlAttributes)
+    public static function select($name, $availableValues = array(), $value = null, $label = null, $htmlAttributes = array())
     {
         $itemData           = array();
         $itemData['name']   = $name;
@@ -236,7 +248,7 @@ class FormItem
         $output = '';
         foreach ($this->objectHtmlProperties as $currentAttribute) {
             if (!($currentAttribute == 'value' && $skipValue)) {
-                if ($this->$currentAttribute != '') {
+                if ($this->$currentAttribute !== null) {
                     $output .= ' ' . $currentAttribute . '="' . htmlentities($this->$currentAttribute, ENT_COMPAT, static::$encoding) . '"';
                 }
             }
