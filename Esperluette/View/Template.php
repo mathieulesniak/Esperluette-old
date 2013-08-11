@@ -14,12 +14,12 @@ class Template
 
     public function setTemplate($file)
     {
-        $this->templateFile = THEME_DIR . DIRECTORY_SEPARATOR . Config::get('theme') . DIRECTORY_SEPARATOR . $file . '.php';
+        $this->templateFile = THEME_DIR . DIRECTORY_SEPARATOR . Config::get('theme', 'default') . DIRECTORY_SEPARATOR . $file . '.php';
     }
 
     public function exists($file)
     {
-        return is_readable(THEME_DIR . DIRECTORY_SEPARATOR . Config::get('theme') . DIRECTORY_SEPARATOR . $file . '.php');
+        return is_readable(THEME_DIR . DIRECTORY_SEPARATOR . Config::get('theme', 'default') . DIRECTORY_SEPARATOR . $file . '.php');
     }
     public function render()
     {
