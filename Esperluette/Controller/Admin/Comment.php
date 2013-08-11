@@ -9,7 +9,7 @@ class Comment extends \Esperluette\Controller\Base
     public function getComments($statusName = '', $page = '')
     {
         $model  = new Model\Comment\CommentList();
-        $view   = new View\Admin\CommentHomepage($model);
+        $view   = new View\Admin\Comment\Homepage($model);
 
         $this->response->setBody($view->render());
     }
@@ -24,7 +24,7 @@ class Comment extends \Esperluette\Controller\Base
             } else {
                 // Unknown comment
             }
-            $view = new View\Admin\Comment($model);
+            $view = new View\Admin\Comment\Edit($model);
             $this->response->setBody($view->render());
         }
     }

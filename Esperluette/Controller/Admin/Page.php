@@ -10,7 +10,7 @@ class Page extends \Esperluette\Controller\Base
     public function getPages($statusName = '',$page = '')
     {
         $model  = new Model\Blog\PageList();
-        $view   = new View\Admin\PageHomepage($model);
+        $view   = new View\Admin\Page\Homepage($model);
 
         $this->response->setBody($view->render());
     }
@@ -18,7 +18,7 @@ class Page extends \Esperluette\Controller\Base
     public function addPage()
     {
         $model  = new Model\Blog\Page();
-        $view   = new View\Admin\Page($model);
+        $view   = new View\Admin\Page\Edit($model);
 
         $this->response->setBody($view->render());
     }
@@ -33,7 +33,7 @@ class Page extends \Esperluette\Controller\Base
             } else {
                 //Unknown post
             }
-            $view = new View\Admin\Page($model);
+            $view = new View\Admin\Page\Edit($model);
             $this->response->setBody($view->render());
         }
     }

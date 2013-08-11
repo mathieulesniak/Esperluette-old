@@ -1,12 +1,12 @@
 <?php
-namespace Esperluette\View\Admin;
+namespace Esperluette\View\Admin\Post;
 
 use Esperluette\Model;
 use Experluette\View;
 use Esperluette\Model\Helper;
 
 
-class PostPreview extends \Esperluette\View\Admin
+class Preview extends \Esperluette\View\Admin
 {
     protected $removeTemplate = true;
     public function render($content = '')

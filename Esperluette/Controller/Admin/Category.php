@@ -8,8 +8,8 @@ class Category extends \Esperluette\Controller\Base
 {
     public function getCategories($page = '')
     {
-        $model = Model\Blog\CategoryList();
-        $view   = new View\Admin\CategoryHomepage($model);
+        $model = new Model\Blog\CategoryList();
+        $view   = new View\Admin\Category\Homepage($model);
 
         $this->response->setBody($view->render());
     }
@@ -17,7 +17,7 @@ class Category extends \Esperluette\Controller\Base
     public function addCategory()
     {
         $model  = new Model\Blog\Category();
-        $view   = new View\Admin\Category($model);
+        $view   = new View\Admin\Category\Edit($model);
         $this->response->setBody($view->render());
     }
 
@@ -31,7 +31,7 @@ class Category extends \Esperluette\Controller\Base
             } else {
                 // Unknown comment
             }
-            $view = new View\Admin\Category($model);
+            $view = new View\Admin\Category\Edit($model);
             $this->response->setBody($view->render());
         }
     }

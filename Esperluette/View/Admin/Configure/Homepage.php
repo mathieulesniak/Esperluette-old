@@ -1,5 +1,5 @@
 <?php
-namespace Esperluette\View\Admin;
+namespace Esperluette\View\Admin\Configure;
 
 use Esperluette\Model;
 use Esperluette\Model\Theme;
@@ -10,7 +10,7 @@ use Fwk\Fwk;
 use Esperluette\Model\Config;
 
 
-class ConfigureHomepage extends \Esperluette\View\Admin
+class Homepage extends \Esperluette\View\Admin
 {
     protected $section = 'setup';
 
@@ -57,7 +57,7 @@ class ConfigureHomepage extends \Esperluette\View\Admin
         // date format
         // timezone
         // time format
-        $output .= '    <p>' . FormItem::text('posts_per_page', $formValues['posts_per_page'], Helper::i18n('admin.setup.posts_per_page')) . '</p>';
+        $output .= '    <p>' . FormItem::number('posts_per_page', $formValues['posts_per_page'], Helper::i18n('admin.setup.posts_per_page'), array('step' => 1, 'min' => 1)) . '</p>';
         $output .= '</fieldset>';
 
         // Comments
@@ -65,7 +65,7 @@ class ConfigureHomepage extends \Esperluette\View\Admin
         $output .= '    <legend>' . Helper::i18n('admin.setup.comments') . '</legend>';
         $output .= '    <p>' . FormItem::checkbox('comments_enabled', 1, $formValues['comments_enabled'] == 1, Helper::i18n('admin.setup.comments_enabled')) . '</p>';
         $output .= '    <p>' . FormItem::checkbox('comments_name_email_required', 1, $formValues['comments_name_email_required'], Helper::i18n('admin.setup.comments_name_email_required')) . '</p>';
-        $output .= '    <p>' . FormItem::text('comments_autoclose_after', $formValues['comments_autoclose_after'], Helper::i18n('admin.setup.comments_autoclose_after')) . '</p>';
+        $output .= '    <p>' . FormItem::number('comments_autoclose_after', $formValues['comments_autoclose_after'], Helper::i18n('admin.setup.comments_autoclose_after'), array('step' => 1, 'min' => 0)) . '</p>';
         $output .= '<p>';
         $output .= FormItem::select(
             'comments_order',

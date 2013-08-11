@@ -16,7 +16,7 @@ class Post extends \Esperluette\Controller\Base
         } else {
             $model = Model\Blog\PostList::loadAll();
         }
-        $view   = new View\Admin\PostHomepage($model);
+        $view   = new View\Admin\Post\Homepage($model);
 
         $this->response->setBody($view->render());
     }
@@ -24,7 +24,7 @@ class Post extends \Esperluette\Controller\Base
     public function addPost()
     {
         $model  = new Model\Blog\Post();
-        $view   = new View\Admin\Post($model);
+        $view   = new View\Admin\Post\Edit($model);
 
         $this->response->setBody($view->render());
     }
@@ -36,7 +36,7 @@ class Post extends \Esperluette\Controller\Base
             $model->load($postId);
 
             if ($model->id !== null) {
-                $view = new View\Admin\PostPreview($model);
+                $view = new View\Admin\Post\Preview($model);
             }
         }
 
@@ -45,12 +45,8 @@ class Post extends \Esperluette\Controller\Base
 
     public function editPost($postId)
     {
-        echo 'TOTOT';
-        echo FormItem::date('test', '123', 'mon champ');
-
+        
         $tmp = new Formitem();
-
-        echo "DEBUG " . $tmp->toto;
 
         if ($postId != '') {
             $model = new Model\Blog\Post();
@@ -60,7 +56,7 @@ class Post extends \Esperluette\Controller\Base
             } else {
                 //Unknown post
             }
-            $view = new View\Admin\Post($model);
+            $view = new View\Admin\Post\Edit($model);
             $this->response->setBody($view->render());
         }
     }

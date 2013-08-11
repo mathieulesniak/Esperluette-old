@@ -53,9 +53,13 @@ class Configure extends \Esperluette\Controller\Base
                 ->validate('posts_per_page')
                 ->digit(Helper::i18n('error.config.post_per_page_number'));
 
+            $validator
+                ->validate('comments_autoclose_after')
+                ->digit(Helper::i18n('error.config.comments_autoclose_after_number'))
+                ->notBlank(Helper::i18n('error.config.comments_autoclose_after_empty'));
+
             if ($errors = $validator->getErrors()) {
                 Notification::write('error', $errors);
-
             } else {
                 Model\Meta\MetaList::buildFromArray($config)->save();
                 Notification::write('success', 'All good !');
@@ -63,7 +67,7 @@ class Configure extends \Esperluette\Controller\Base
             }
         }
 
-        $view = new View\Admin\ConfigureHomepage($model);
+        $view = new View\Admin\Configure\Homepage($model);
 
         $this->response->setBody($view->render());
     }
