@@ -149,6 +149,31 @@ class Request
     {
         return $this->requestUri;
     }
+
+    public static function getPostParam($variable, $defaultValue = null)
+    {
+        if (isset($_POST[$variable])) {
+            return $_POST[$variable];
+        }
+        return $defaultValue;
+    }
+
+    public static function getParam($variable, $defaultValue = null)
+    {
+        if (isset($_GET[$variable])) {
+            return $_GET[$variable];
+        } elseif (isset($_POST[$variable])) {
+            return $_POST[$variable];
+        } else {
+            return $defaultValue;
+        }
+    }
+
+    public static function hasParam($variable)
+    {
+        return isset($_GET[$variable]) || isset($_POST[$variable]);
+    }
+
        
     public function setHeaders($headers)
     {
@@ -241,6 +266,9 @@ class Request
     {
         $this->setHttpCode($httpCode);
         $this->addHeader('Location', $url);
+
+        $this->write();
+        die();
     }
 
     public function isOK()
