@@ -164,10 +164,14 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
     {
         // 1st step : delete all records for current parent_id
         $sql  = "DELETE FROM `" . static::TABLE_NAME . "`";
-        $sql .= " WHERE";
-        $sql .= "   " . static::PARENT_ID_NAME . "=:parent_id";
+        if (static::PARENT_ID_NAME != '') {
+            $sql .= " WHERE";
+            $sql .= "   " . static::PARENT_ID_NAME . "=:parent_id";
 
-        $sqlParams = array('parent_id' => $this->parent_id);
+            $sqlParams = array('parent_id' => $this->parent_id);
+        } else {
+            $sqlParams = array();
+        }
 
         Fwk::Database()->query($sql, $sqlParams);
 
