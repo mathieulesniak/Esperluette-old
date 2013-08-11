@@ -71,7 +71,7 @@ class ConfigureHomepage extends \Esperluette\View\Admin
             'comments_order',
             array('ASC' => Helper::i18n('admin.setup.comments_order_asc'), 'DESC' => Helper::i18n('admin.setup.comments_order_desc')),
             $formValues['comments_order'],
-            Helper::i18n('admin.setup.comments_autoclose_after')
+            Helper::i18n('admin.setup.comments_order')
         );
         $output .= '</p>';
         
