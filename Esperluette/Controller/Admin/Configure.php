@@ -2,23 +2,66 @@
 namespace Esperluette\Controller\Admin;
 
 use \Esperluette\Model;
+use \Esperluette\Model\Helper;
 use \Esperluette\View;
-use \Fwk\Helper;
-use \Fwk\FormItem;
+use \Esperluette\Model\Notification;
+use \Fwk\Validator;
+use \Fwk\Fwk;
 
 class Configure extends \Esperluette\Controller\Base
 {
     public function getHomepage()
     {
-
         if (isset($_POST['save_configuration'])) {
-            Helper::debug($_POST);
-            // Save config
+            $configOptions = array(
+                'site_name'                     => '',
+                'site_description'              => '',
+                'language'                      => '',
+                'admin_email'                   => '',
+                'posts_per_page'                => 0,
+                'comments_enabled'              => 0,
+                'comments_name_email_required'  => 0,
+                'comments_autoclose_after'      => 0,
+                'comments_order'                => 'ASC',
+                'comments_autoallow'            => 0,
+                'comments_notify'               => 0,
+                'comments_hold_links_nb'        => 0,
+                'comments_wordlist_hold'        => '',
+                'comments_wordlist_spam'        => '',
+                'theme'                         => '',
+            );
             
-            // Reload config & inject notification
+            foreach ($configOptions as $item => $defaultValue) {
+                $config[$item] = Fwk::Request()->getPostParam($item, $defaultValue);
+            }
+            
+            $validator = new Validator($config);
+
+            $validator
+                ->validate('site_name')
+                ->longerThan(2, Helper::i18n('error.config.site_name_empty'));
+
+            $validator
+                ->validate('site_description')
+                ->longerThan(2, Helper::i18n('error.config.site_description_empty'));
+
+            $validator
+                ->validate('admin_email')
+                ->email(Helper::i18n('error.config.admin_email_invalid'));
+
+            $validator
+                ->validate('posts_per_page')
+                ->digit(Helper::i18n('error.config.post_per_page_number'));
+
+            if ($errors = $validator->getErrors()) {
+                Notification::write('error', $errors);
+
+            } else {
+                Model\Meta\MetaList::buildFromArray($config)->save();
+                Notification::write('success', 'All good !');
+                $this->response->redirect($_SERVER['REQUEST_URI']);
+            }
         }
-        $model = new Model\Meta\MetaList();
-        $model->loadConfigurationMetas();
 
         $view = new View\Admin\ConfigureHomepage($model);
 
