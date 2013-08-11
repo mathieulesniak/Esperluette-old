@@ -333,7 +333,7 @@ class DBObject implements Interfaces\IDBObject
         
         $this->dbLink->query($sql, $sqlParams);
 
-        $this->id = $this->dbLink->lastInsertId();
+        $this->{static::TABLE_INDEX} = $this->dbLink->lastInsertId();
     }
     
     protected function connectDB()
