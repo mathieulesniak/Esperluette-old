@@ -40,7 +40,7 @@ class Helper
                     return static::$translations[$str];
                 }
             } else {
-                Fwk::Logger()->debug(sprintf('Missing translation in %s for \'%s\'', $lang, $str));
+                //Fwk::Logger()->debug(sprintf('Missing translation in %s for \'%s\'', $lang, $str));
                 return $str;
             }
         }
@@ -49,5 +49,21 @@ class Helper
     public static function url($url)
     {
         return Fwk::App()->getParameter('url') . $url;
+    }
+
+    public static function sluginator($str)
+    {
+
+        $str = strtr(
+            utf8_decode($str),
+            utf8_decode("ÀÁÂÃÄÅàáâãäåÇçÒÓÔÕÖØòóôõöøÈÉÊËèéêëÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ"),
+            "AAAAAAaaaaaaCcOOOOOOooooooEEEEeeeeIIIIiiiiUUUUuuuuyNn"
+        );
+
+        $str = preg_replace('/[^a-z0-9_-\s]/', '', strtolower($str));
+        $str = preg_replace('/[\s]+/', ' ', trim($str));
+        $str = str_replace(' ', '-', $str);
+
+        return $str;
     }
 }
