@@ -170,11 +170,14 @@ class Validator
             $this->value = $this->datas;
             $this->index = null;
         } else {
-            if (isset($this->datas[$index])) {
+            if (is_object($this->datas) && isset($this->datas->$index)) {
+                $this->value = $this->datas->$index;
+                $this->index = $index;
+            } elseif (isset($this->datas[$index])) {
                 $this->value = $this->datas[$index];
                 $this->index = $index;
             } else {
-                throw new \InvalidArgumentException('Array index ' . $index . ' does not exists');
+                throw new \InvalidArgumentException('Index / Property' . $index . ' does not exists');
             }
         }
 
