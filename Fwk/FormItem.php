@@ -64,7 +64,11 @@ class FormItem
         $itemData['type']   = $type;
         $itemData['name']   = $name;
         $itemData['value']  = $value;
-        $itemData['label']  = $label;
+        
+        if ($label !== null && !isset($htmlAttributes['id'])) {
+            $itemData['label']  = $label;
+            $itemData['id']     = $name;
+        }
         $itemData = array_merge($itemData, $htmlAttributes);
 
         $item = new FormItem($itemData);
@@ -99,8 +103,8 @@ class FormItem
 
     public static function checkbox($name, $value = 1, $checked = false, $label = null, $htmlAttributes = array()) 
     {
-        if (isset($attributes['checked']) && $checked) {
-            $attributes['checked'] = 'checked';
+        if (!isset($htmlAttributes['checked']) && $checked) {
+            $htmlAttributes['checked'] = 'checked';
         }
         
         return static::input('checkbox', $name, $value, $label, $htmlAttributes);
