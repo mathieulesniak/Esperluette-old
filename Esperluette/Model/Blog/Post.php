@@ -145,7 +145,12 @@ class Post extends \Fwk\DBObject
 
     public function commentsEnabled()
     {
-        return $this->comments && (time() - 24*3600*45) <= strtotime($this->date);
+        $commentAutoclose = Config::get('comments_autoclose_after');
+        if ($commentAutoclose) {
+            return $this->comments && ((time() - $commentAutoclose) <= strtotime($this->date));
+        } else {
+            return $this->comments;
+        }
     }
 
     public function delete()
