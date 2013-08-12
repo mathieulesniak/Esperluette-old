@@ -13,7 +13,9 @@ class Category extends \Fwk\DBObject
         $this->dbVariables = array(
                                 'id',
                                 'name',
-                                'slug'
+                                'slug',
+                                'description',
+                                'parent_id'
                             );
     }
 }
