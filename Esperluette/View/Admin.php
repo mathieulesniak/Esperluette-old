@@ -77,6 +77,7 @@ class Admin extends \Fwk\Page
             $notifications = Notification::read();
             if ($notifications !== '') {
                 // Output notifications
+                $output .= $notifications;
             }
         }
 
