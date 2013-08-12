@@ -11,10 +11,18 @@ use Fwk\Validator;
 
 class Category extends \Esperluette\Controller\Base
 {
-    public function getCategories($page = '')
+    public function getCategories($page = 1)
     {
-        $model = new Model\Blog\CategoryList();
-        $view   = new View\Admin\Category\Homepage($model);
+        $model = Model\Blog\CategoryList::loadAll();
+        $subModel = $model->getSlice(($page - 1) * ADMIN_NB_CATEGORIES_PER_PAGE, ADMIN_NB_CATEGORIES_PER_PAGE);
+
+        $view   = new View\Admin\Category\Homepage($subModel);
+        $view
+            ->setCurrentPage($page)
+            ->setNbItems(count($model))
+            ->setNbPerPage(ADMIN_NB_CATEGORIES_PER_PAGE)
+            ->setUrl(Helper::url('/admin/categories'));
+
 
         $this->response->setBody($view->render());
     }

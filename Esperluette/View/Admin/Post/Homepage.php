@@ -6,7 +6,7 @@ use Experluette\View;
 use Esperluette\Model\Helper;
 use Fwk\FormItem;
 
-class Homepage extends \Esperluette\View\Admin
+class Homepage extends \Esperluette\View\PaginatedAdmin
 {
     public function render($content = '')
     {   
