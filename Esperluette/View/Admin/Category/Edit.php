@@ -21,7 +21,6 @@ class Edit extends \Esperluette\View\Admin
             'parent_id'     => Fwk::Request()->getPostParam('parent_id', $this->model->parent_id),
         );
 
-print_r($formValues);
         if ($this->model->id !== null) {
             $output  = '<h1>' . Helper::i18n('admin.categories.edit') . '</h1>';
         } else {
