@@ -3,6 +3,7 @@ namespace Esperluette\View\Admin\Configure;
 
 use Esperluette\Model;
 use Esperluette\Model\Theme;
+use Esperluette\Model\Blog\CategoryList;
 use Esperluette\View;
 use Esperluette\Model\Helper;
 use Fwk\FormItem;
@@ -21,6 +22,7 @@ class Homepage extends \Esperluette\View\Admin
             'site_description'              => Fwk::Request()->getPostParam('site_description', Config::get('site_description')),
             'admin_email'                   => Fwk::Request()->getPostParam('admin_email', Config::get('admin_email')),
             'language'                      => Fwk::Request()->getPostParam('language', Config::get('language')),
+            'posts_default_category'        => Fwk::Request()->getPostParam('posts_default_category', Config::get('posts_default_category')),
             'posts_per_page'                => Fwk::Request()->getPostParam('posts_per_page', Config::get('posts_per_page')),
             'comments_enabled'              => Fwk::Request()->getPostParam('comments_enabled', Config::get('comments_enabled')),
             'comments_name_email_required'  => Fwk::Request()->getPostParam('comments_name_email_required', Config::get('comments_name_email_required')),
@@ -57,7 +59,17 @@ class Homepage extends \Esperluette\View\Admin
         // date format
         // timezone
         // time format
+        $output .= '</fieldset>';
+        $output .= '<fieldset>';
+        $output .= '    <legend>' . Helper::i18n('admin.setup.posts') . '</legend>';
         $output .= '    <p>' . FormItem::number('posts_per_page', $formValues['posts_per_page'], Helper::i18n('admin.setup.posts_per_page'), array('step' => 1, 'min' => 1)) . '</p>';
+        $categoriesList = CategoryList::loadAll();
+        $output .= '    <p>' . FormItem::select(
+            'posts_default_category',
+            $categoriesList->getAsArray(),
+            $formValues['posts_default_category'],
+            Helper::i18n('admin.setup.posts_default_category')
+            ) . '</p>';
         $output .= '</fieldset>';
 
         // Comments
@@ -86,12 +98,14 @@ class Homepage extends \Esperluette\View\Admin
         $themeList = new Theme\ThemeList();
         $output .= '<fieldset>' . "\n";;
         $output .= '    <legend>' . Helper::i18n('admin.setup.themes') . '</legend>'."\n";
+        $output .= '    <p>';
         $output .= FormItem::select(
             'theme',
             $themeList->getAsArray(),
             $formValues['theme'],
             Helper::i18n('admin.setup.theme')
         );
+        $output .= '</p>';
         $output .= '</fieldset>' . "\n";
 
         $output .= FormItem::submit('save_configuration', Helper::i18n('admin.setup.save'));
