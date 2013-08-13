@@ -16,7 +16,7 @@ function siteDescription()
 
 function themeInclude($part)
 {
-    include THEME_DIR . DIRECTORY_SEPARATOR . Config::get('theme') . DIRECTORY_SEPARATOR . $part . '.php';
+    include THEME_DIR . DIRECTORY_SEPARATOR . Config::get('theme', 'default') . DIRECTORY_SEPARATOR . $part . '.php';
 }
 
 function getNextPost()
