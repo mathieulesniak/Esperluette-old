@@ -1,30 +1,35 @@
 <?php
 namespace Esperluette\Controller\Admin;
 
-use \Esperluette\Model;
-use \Esperluette\View;
-use \Fwk\Helper;
-use \Fwk\FormItem;
+use Esperluette\Model;
+use Esperluette\View;
+use Esperluette\Model\Helper;
+use Esperluette\Model\Notification;
+use Fwk\Fwk;
+use Fwk\Validator;
 
 class Post extends \Esperluette\Controller\Base
 {
-    public function getPosts($categoryName = '',$page = '')
+    public function getPosts($categoryName = '', $page = null)
     {
+        if ($page == null) {
+            $page = 1;
+        }
+
         if ($categoryName != '') {
             $model  = new Model\Blog\PostList();
             $model->loadForCategorySlug(urldecode($categoryName));
         } else {
             $model = Model\Blog\PostList::loadAll();
         }
-        $view   = new View\Admin\Post\Homepage($model);
+        $subModel = $model->getSlice(($page - 1) * ADMIN_NB_POSTS_PER_PAGE, ADMIN_NB_POSTS_PER_PAGE);
 
-        $this->response->setBody($view->render());
-    }
-
-    public function addPost()
-    {
-        $model  = new Model\Blog\Post();
-        $view   = new View\Admin\Post\Edit($model);
+        $view   = new View\Admin\Post\Homepage($subModel);
+        $view
+            ->setCurrentPage($page)
+            ->setNbItems(count($model))
+            ->setNbPerPage(ADMIN_NB_POSTS_PER_PAGE)
+            ->setUrl(Helper::url('/admin/posts'));
 
         $this->response->setBody($view->render());
     }
@@ -43,7 +48,7 @@ class Post extends \Esperluette\Controller\Base
         $this->response->setBody($view->render());
     }
 
-    public function editPost($postId)
+    public function editPost($postId = null)
     {
         
         $tmp = new Formitem();

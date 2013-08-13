@@ -6,10 +6,26 @@ use \Esperluette\View;
 
 class Comment extends \Esperluette\Controller\Base
 {    
-    public function getComments($statusName = '', $page = '')
+    public function getComments($statusName = '', $page = null)
     {
-        $model  = new Model\Comment\CommentList();
-        $view   = new View\Admin\Comment\Homepage($model);
+        if ($page == null) {
+            $page = 1;
+        }
+        
+        if ($statusName == '') {
+            $model  = Model\Comment\CommentList::loadAll();
+        } else {
+            $model = new Model\Comment\CommentList();
+            $model->loadForStatus($statusName);
+        }
+        $subModel = $model->getSlice(($page - 1) * ADMIN_NB_COMMENTS_PER_PAGE, ADMIN_NB_COMMENTS_PER_PAGE);
+
+        $view   = new View\Admin\Comment\Homepage($subModel);
+        $view
+            ->setCurrentPage($page)
+            ->setNbItem(count($model))
+            ->setNbPerPage(ADMIN_NB_COMMENTS_PER_PAGE)
+            ->setUrl(Helper::url('/admin/comments'));
 
         $this->response->setBody($view->render());
     }
