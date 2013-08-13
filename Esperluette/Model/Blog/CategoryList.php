@@ -8,13 +8,20 @@ class CategoryList extends \Fwk\Collection
     const TABLE_NAME    = 'blog_categories';
     const ITEM_TYPE     = '\Esperluette\Model\Blog\Category';
 
-    public function getAsArray()
+    private $tree;
+
+    public static function loadAllSorted()
     {
-        $resultId   = array();
-        $results    = array();
+        $sql  = "SELECT *";
+        $sql .= "   FROM `" . self::TABLE_NAME . "`";
+        $sql .= "   ORDER BY parent_id ASC, name ASC";
+        $sqlParams  = array();
 
-        $this->sort('name', self::SORT_ASC);
+        return parent::buildFromSql($sql, $sqlParams);
+    }
 
+    public function generateTree()
+    {
         $tree = array();
         foreach ($this->items as $currentItem) {
             $id = $currentItem->id;
@@ -33,10 +40,21 @@ class CategoryList extends \Fwk\Collection
             $tree[$parent][$id] =& $tree[$id];
         }
 
-        $it = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($tree[0]));
+        $this->tree = $tree[0];
+        
+        $it = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($this->tree));
         
         foreach ($it as $el) {
-            $result[$it->key()] = str_repeat('—', $it->getDepth() - 1) . $el;
+              $this->getItemFromKey($it->key())->depth = $it->getDepth() - 1;
+        }
+
+        return $this;
+    }
+
+    public function getAsArray()
+    {
+        foreach ($this->items as $currentItem) {
+            $result[$currentItem->id] = str_repeat('—', $currentItem->depth) . $currentItem->name;
         }
         
         return $result;

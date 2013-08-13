@@ -21,7 +21,7 @@ class Homepage extends \Esperluette\View\PaginatedAdmin
             $output .= '<ul>';
             foreach ($this->model as $currentCategory) {
                 $output .= '<li>';
-                $output .= $currentCategory->name;
+                $output .= str_repeat('—', $currentCategory->depth) . $currentCategory->name;
                 $output .= '</li>';
             }
             $output .= '</ul>';

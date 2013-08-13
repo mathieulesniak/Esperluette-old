@@ -302,6 +302,14 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
         return $this->parent_id;
     }
 
+    public function getItemFromKey($key)
+    {
+        $invertedMapping = array_flip($this->mapping);
+        if (isset($invertedMapping[$key])) {
+            return $this->items[$invertedMapping[$key]];
+        }
+    }
+
 
     // Implementation of Countable Interface
     public function count()

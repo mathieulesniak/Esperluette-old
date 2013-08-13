@@ -6,6 +6,7 @@ use Esperluette\Model;
 use Esperluette\Model\Config;
 use Esperluette\Model\Helper;
 use Esperluette\Model\Notification;
+use Esperluette\Model\Blog\CategoryList;
 use Fwk\Fwk;
 use Fwk\Validator;
 
@@ -18,7 +19,7 @@ class Category extends \Esperluette\Controller\Base
             $page = 1;
         }
 
-        $model = Model\Blog\CategoryList::loadAll();
+        $model = Model\Blog\CategoryList::loadAllSorted()->generateTree();
         $subModel = $model->getSlice(($page - 1) * ADMIN_NB_CATEGORIES_PER_PAGE, ADMIN_NB_CATEGORIES_PER_PAGE);
 
         $view   = new View\Admin\Category\Homepage($subModel);

@@ -7,6 +7,7 @@ class Category extends \Fwk\DBObject
 {
     const TABLE_NAME    = 'blog_categories';
     const TABLE_INDEX   = 'id';
+    public $depth;
     
     public function __construct()
     {

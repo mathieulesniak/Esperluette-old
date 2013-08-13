@@ -63,10 +63,10 @@ class Homepage extends \Esperluette\View\Admin
         $output .= '<fieldset>';
         $output .= '    <legend>' . Helper::i18n('admin.setup.posts') . '</legend>';
         $output .= '    <p>' . FormItem::number('posts_per_page', $formValues['posts_per_page'], Helper::i18n('admin.setup.posts_per_page'), array('step' => 1, 'min' => 1)) . '</p>';
-        $categoriesList = CategoryList::loadAll();
+        $categoriesList = CategoryList::loadAllSorted();
         $output .= '    <p>' . FormItem::select(
             'posts_default_category',
-            $categoriesList->getAsArray(),
+            $categoriesList->generateTree()->getAsArray(),
             $formValues['posts_default_category'],
             Helper::i18n('admin.setup.posts_default_category')
             ) . '</p>';
