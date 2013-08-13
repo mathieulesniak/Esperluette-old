@@ -18,6 +18,7 @@ class Configure extends \Esperluette\Controller\Base
                 'site_description'              => '',
                 'language'                      => '',
                 'admin_email'                   => '',
+                'posts_default_category'        => '',
                 'posts_per_page'                => 0,
                 'comments_enabled'              => 0,
                 'comments_name_email_required'  => 0,
@@ -48,7 +49,10 @@ class Configure extends \Esperluette\Controller\Base
             $validator
                 ->validate('admin_email')
                 ->email(Helper::i18n('error.config.admin_email_invalid'));
-
+            $validator
+                ->validate('posts_default_category')
+                ->notBlank(Helper::i18n('error.config.posts_default_category_empty'));
+                
             $validator
                 ->validate('posts_per_page')
                 ->digit(Helper::i18n('error.config.post_per_page_number'));
