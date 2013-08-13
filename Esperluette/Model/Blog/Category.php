@@ -17,5 +17,36 @@ class Category extends \Fwk\DBObject
                                 'description',
                                 'parent_id'
                             );
+
+        $this->protectedVariables = array(
+            'posts'
+            );
+
+        $this->posts = new PostList();
+    }
+
+    protected function accessToProtectedVariable($property_name)
+    {
+        switch ($property_name) {
+            case 'posts':
+                $result = $this->loadPosts();
+                break;
+            default:
+                $result = false;
+                break;
+        }
+        
+        return $result;
+    }
+
+    private function loadPosts()
+    {
+        if ($this->id != '') {
+            $postList = new PostList();
+            $postList->loadForCategoryId($this->id);
+            $this->posts = $postList;
+        }
+
+        return true;
     }
 }
