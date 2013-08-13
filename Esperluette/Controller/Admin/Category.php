@@ -1,8 +1,9 @@
 <?php
 namespace Esperluette\Controller\Admin;
 
-use Esperluette\Model;
 use Esperluette\View;
+use Esperluette\Model;
+use Esperluette\Model\Config;
 use Esperluette\Model\Helper;
 use Esperluette\Model\Notification;
 use Fwk\Fwk;
@@ -11,8 +12,12 @@ use Fwk\Validator;
 
 class Category extends \Esperluette\Controller\Base
 {
-    public function getCategories($page = 1)
+    public function getCategories($page = null)
     {
+        if ($page == null) {
+            $page = 1;
+        }
+
         $model = Model\Blog\CategoryList::loadAll();
         $subModel = $model->getSlice(($page - 1) * ADMIN_NB_CATEGORIES_PER_PAGE, ADMIN_NB_CATEGORIES_PER_PAGE);
 
@@ -81,10 +86,27 @@ class Category extends \Esperluette\Controller\Base
     function deleteCategory($categoryId)
     {
         if ($categoryId != '') {
-            $model = Model\Blog\Category();
+            $model = new Model\Blog\Category();
             $model->load($categoryId);
             if ($model->id !== null) {
-                $model->delete();
+                
+                // Cannot delete default category
+                if ($model->id == Config::get('posts_default_category')) {
+                    Notification::write('error', Helper::i18n('error.categories.cannot_delete_default'));
+                    $this->response->redirect(Helper::url('/admin/categories'));
+                }
+
+                // Reassign posts
+                $postList = $model->posts;
+                foreach ($postList as $currentPost) {
+                    $currentPost->category = Config::get('posts_default_category');
+                    $currentPost->save();
+                }
+
+                //$model->delete();
+                Notification::write('success', 'All good !');
+                
+
             }
         }
     }
