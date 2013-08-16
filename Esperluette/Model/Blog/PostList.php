@@ -28,6 +28,22 @@ class PostList extends \Fwk\Collection
         return $this;
     }
 
+    public function loadForUserId($userId)
+    {
+        $sqlParams  = array();
+
+        $sql  = "SELECT *";
+        $sql .= " FROM `" . self::TABLE_NAME . "`";
+        $sql .= " WHERE";
+        $sql .="    author_id = :authorId";
+
+        $sqlParams['authorId'] = $userId;
+
+        $this->loadFromSql($sql, $sqlParams);
+
+        return $this;
+    }
+
     /**
      * Load all online post for a given month
      * Lazy load, no sort possible on collection
@@ -98,25 +114,27 @@ class PostList extends \Fwk\Collection
         return $this;
     }
 
-    /**
-     * Load all post for a given category
-     * No lazy load, all items created
-     * @param  int $categoryId  Category id
-     * @return PostList         The post Collection
-     */
-    public function loadForCategoryId($categoryId)
+  
+    public function loadForCategoryId($categoryId, $filterOnline = false, $lazyLoad = false)
     {
         $sql            = '';
         $sqlParams      = array();
         
         $sql  = "SELECT *";
         $sql .= " FROM `" . self::TABLE_NAME . "`";
-        $sql .= " WHERE cat_id=:categoryId";
+        $sql .= " WHERE category_id=:categoryId";
+        if ($filterOnline) {
+            $sql .= " AND status=" . Post::STATUS_PUBLISHED;
+        }
         $sql .= " ORDER BY " . self::TABLE_NAME . ".date DESC";
 
         $sqlParams['categoryId'] = $categoryId;
-        
-        $this->loadFromSql($sql, $sqlParams);
+
+        if ($lazyLoad) {
+            $this->lazyLoadFromSql($sql, $sqlParams);
+        } else {
+            $this->loadFromSql($sql, $sqlParams);
+        }
 
         return $this;
     }
