@@ -1,7 +1,8 @@
 <?php
 namespace Esperluette\Controller\Admin;
 
-use \Esperluette\Model;
+use Esperluette\Model;
+use Esperluette\Model\Helper;
 use \Esperluette\View;
 
 class Comment extends \Esperluette\Controller\Base
@@ -23,7 +24,7 @@ class Comment extends \Esperluette\Controller\Base
         $view   = new View\Admin\Comment\Homepage($subModel);
         $view
             ->setCurrentPage($page)
-            ->setNbItem(count($model))
+            ->setNbItems(count($model))
             ->setNbPerPage(ADMIN_NB_COMMENTS_PER_PAGE)
             ->setUrl(Helper::url('/admin/comments'));
 
