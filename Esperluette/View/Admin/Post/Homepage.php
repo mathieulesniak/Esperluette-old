@@ -24,6 +24,10 @@ class Homepage extends \Esperluette\View\PaginatedAdmin
 
         $output .= '</ul>'."\n";
         $output .= '<div id="post-preview"></div>';
+
+        $output .= '<script type="text/javascript">'."\n";
+        $output .= '    var appRoot = "' . Helper::url('/') . '";'."\n";
+        $output .= '</script>'."\n";
         return parent::render($output);
     }
 }

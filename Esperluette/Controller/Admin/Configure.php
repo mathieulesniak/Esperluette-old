@@ -17,6 +17,7 @@ class Configure extends \Esperluette\Controller\Base
                 'site_name'                     => '',
                 'site_description'              => '',
                 'language'                      => '',
+                'timezone'                      => '',
                 'admin_email'                   => '',
                 'posts_default_category'        => '',
                 'posts_per_page'                => 0,
