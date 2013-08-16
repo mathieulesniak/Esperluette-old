@@ -40,6 +40,17 @@ class Category extends \Fwk\DBObject
         return $result;
     }
 
+    public function loadFromSlug($slug)
+    {
+        $sql  = "SELECT *";
+        $sql .= " FROM `" . self::TABLE_NAME . "`";
+        $sql .= " WHERE";
+        $sql .= "   slug = :slug";
+
+        $sqlParams = array('slug' => $slug);
+        $this->loadFromSql($sql, $sqlParams);
+    }
+
     private function loadPosts()
     {
         if ($this->id != '') {

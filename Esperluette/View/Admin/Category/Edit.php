@@ -2,6 +2,7 @@
 namespace Esperluette\View\Admin\Category;
 
 use Esperluette\Model;
+use Esperluette\Model\Blog\CategoryList;
 use Esperluette\View;
 use Esperluette\Model\Helper;
 use Fwk\Fwk;
@@ -38,9 +39,12 @@ class Edit extends \Esperluette\View\Admin
         $output .=          FormItem::textarea('description', $formValues['description'], Helper::i18n('admin.categories.description'));
         $output .= '    </p>';
         $output .= '    <p>';
+        $categoriesList = CategoryList::loadAll()->generateTree()->getAsArray();
+        array_unshift($categoriesList, Helper::i18n('admin.categories.no_parent'));
+        unset($categoriesList[$this->model->id]);
         $output .=          FormItem::select(
             'parent_id',
-            array(),
+            $categoriesList,
             $formValues['parent_id'],
             Helper::i18n('admin.categories.parent_id')
         );

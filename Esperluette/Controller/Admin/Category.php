@@ -19,7 +19,7 @@ class Category extends \Esperluette\Controller\Base
             $page = 1;
         }
 
-        $model = Model\Blog\CategoryList::loadAllSorted()->generateTree();
+        $model = Model\Blog\CategoryList::loadAll()->generateTree();
         $subModel = $model->getSlice(($page - 1) * ADMIN_NB_CATEGORIES_PER_PAGE, ADMIN_NB_CATEGORIES_PER_PAGE);
 
         $view   = new View\Admin\Category\Homepage($subModel);
@@ -97,6 +97,14 @@ class Category extends \Esperluette\Controller\Base
                     $this->response->redirect(Helper::url('/admin/categories'));
                 }
 
+                // Reassign sub categories to current parent
+                $categoryList = Model\Blog\CategoryList::loadAll()->generateTree();
+                $childrenCategories = $categoryList->getChildren($categoryId);
+                foreach ($childrenCategories as $currentChild) {
+                    $currentChild->parent_id = $model->parent_id;
+                    $currentChild->save();
+                }
+
                 // Reassign posts
                 $postList = $model->posts;
                 foreach ($postList as $currentPost) {
@@ -106,8 +114,7 @@ class Category extends \Esperluette\Controller\Base
 
                 //$model->delete();
                 Notification::write('success', 'All good !');
-                
-
+                $this->response->redirect(Helper::url('/admin/categories'));
             }
         }
     }
