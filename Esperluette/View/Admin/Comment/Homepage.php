@@ -2,24 +2,29 @@
 namespace Esperluette\View\Admin\Comment;
 
 use Esperluette\Model;
-use Experluette\View;
+use Esperluette\View;
 use Esperluette\Model\Helper;
-use Fwk\FormItem;
+
 
 class Homepage extends \Esperluette\View\PaginatedAdmin
 {
-    public function render($content = '')
-    {   
-        $output = '<ul class="commentlist">'."\n";
-        foreach ($this->model as $currentComment) {
-            $output .= '<li>';
-            $output .= '    <a href="#">';
-            $output .= '        <time>NICE TIME GOES HERE</time>';
-            $output .= '    </a>';
-            $output .= '</li>';
-        }
+    protected $section = 'comment';
 
-        $output .= '</ul>'."\n";
+    public function render($content = '')
+    {
+        $output  = '<h1>' . Helper::i18n('admin.comments') . '</h1>';
+        
+        if (count($this->model)) {
+            $output .= '<ul class="comment-list">';
+            foreach ($this->model as $currentCategory) {
+                $output .= '<li>';
+                
+                $output .= '</li>';
+            }
+            $output .= '</ul>';
+        }
+        $output .= $this->renderPagination();
+        
         return parent::render($output);
     }
 }
