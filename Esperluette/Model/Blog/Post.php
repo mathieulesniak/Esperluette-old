@@ -23,6 +23,7 @@ class Post extends \Fwk\DBObject
                                 'id',
                                 'category_id',
                                 'title',
+                                'slug',
                                 'author_id',
                                 'intro',
                                 'content',
@@ -97,23 +98,22 @@ class Post extends \Fwk\DBObject
         return true;
     }
 
-    private function loadApp()
-    {
-        if ($this->app_id != '') {
-            $app = new Model\Ouya\App();
-            $app->load($this->app_id);
-
-            $this->app = $app;
-        }
-
-        return true;
-    }
-
     private function loadComments()
     {
         $this->comments_list = Model\Comment\CommentList::loadForParentId($this->id)->sort('date_added', 'ASC');
 
         return true;
+    }
+
+    public function loadFromSlug($slug)
+    {
+        $sql  = "SELECT *";
+        $sql .= " FROM `" . self::TABLE_NAME . "`";
+        $sql .= " WHERE";
+        $sql .= "   slug = :slug";
+
+        $sqlParams = array('slug' => $slug);
+        $this->loadFromSql($sql, $sqlParams);
     }
 
     public function getURL()
