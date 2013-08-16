@@ -50,9 +50,6 @@ class Post extends \Esperluette\Controller\Base
 
     public function editPost($postId = null)
     {
-        
-        $tmp = new Formitem();
-
         if ($postId != '') {
             $model = new Model\Blog\Post();
             $model->load($postId);
