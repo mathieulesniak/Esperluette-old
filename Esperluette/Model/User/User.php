@@ -2,12 +2,20 @@
 namespace Esperluette\Model\User;
 
 use Esperluette\Model;
+use Esperluette\Model\Helper;
 use Fwk;
 
 class User extends Fwk\DBObject
 {
-    const TABLE_NAME    = 'users';
+    const TABLE_NAME    = 'blog_users';
     const TABLE_INDEX   = 'id';
+
+    const LEVEL_USER    = 0;
+    const LEVEL_EDITOR  = 1;
+    const LEVEL_ADMIN   = 2;
+
+    const NAME_DISPLAY_NICKNAME = 0;
+    const NAME_DISPLAY_REAL     = 1;
 
     public function __construct()
     {
@@ -15,39 +23,58 @@ class User extends Fwk\DBObject
                                     'nickname',
                                     'first_name',
                                     'last_name',
+                                    'name_display',
                                     'email',
+                                    'password',
+                                    'active',
+                                    'level'
                                 );
-    
+        $this->protectedVariables = array(
+            'posts'
+        );
+        $this->posts = new Model\Blog\PostList();
         
     }
 
-   
-
-    public function getDisplayName()
+    protected function accessToProtectedVariable($property_name)
     {
-        return ( $this->nickname != '' ) ? $this->nickname : $this->first_name . ' ' . $this->last_name;
-    }
-    public function getUrl()
-    {
-    }
-
-    public function hasAvatar()
-    {
-        return is_file($_SERVER['DOCUMENT_ROOT'] . Property::getValueFor('avatarDir') . $this->id . '.pic');
-    }
-
-    public function getAvatarUrl()
-    {
-        if ($this->hasAvatar()) {
-            return Property::getValueFor('avatarDir') . $this->id . '.pic';
+        switch ($property_name) {
+            case 'posts':
+                $result = $this->loadPosts();
+                break;
+            default:
+                $result = false;
+                break;
         }
+        
+        return $result;
     }
 
-    public function delete() {
-        /**
-         TODO : delete all written posts ?
-         */
-        
-        parent::delete();
+    private function loadPosts()
+    {
+        if ($this->id != '') {
+            $postList = new Model\Blog\PostList();
+            $postList->loadForUserId($this->id);
+            $this->posts = $postList;
+        }
+
+        return true;
+    }
+
+    public static function getLevels()
+    {
+        return array(
+            self::LEVEL_USER    => Helper::i18n('admin.user.level_' . self::LEVEL_USER),
+            self::LEVEL_EDITOR  => Helper::i18n('admin.user.level_' . self::LEVEL_EDITOR),
+            self::LEVEL_ADMIN   => Helper::i18n('admin.user.level_' . self::LEVEL_ADMIN)
+        );
+    }
+
+    public static function getNameDisplayOptions()
+    {
+        return array(
+            self::NAME_DISPLAY_NICKNAME => Helper::i18n('admin.user.namedisplay_' . self::NAME_DISPLAY_NICKNAME),
+            self::NAME_DISPLAY_REAL     => Helper::i18n('admin.user.namedisplay_' . self::NAME_DISPLAY_REAL)
+        );
     }
 }
