@@ -7,11 +7,21 @@ use \Fwk\Registry;
 
 class Blog extends Base
 {
+    public function getHomepage()
+    {
+        echo "HP";
+    }
+
     public function getPost($postName)
     {
         // Load model
         $model = new Model\Blog\Post();
-        $model->load(1);
+        $model->loadFromSlug($postName);
+
+        if ($model->id === null) {
+            // trigger 404
+            echo '404 !!';
+        }
         Registry::set('post', $model);
         // Set Model data into registry
         
@@ -32,10 +42,23 @@ class Blog extends Base
         $this->response->setBody($view->render());
     }
 
-    public function getPostsByCategory()
+    public function getPostsByCategory($categoryName, $page = '')
     {
+
+        $category = new Model\Blog\Category();
+        $category->loadFromSlug($categoryName);
+        if ($category->id === null) {
+            // Trigger 404
+            echo '404 category';
+        } else {
+            $collection = new Model\Blog\PostList();
+            $model = $collection->loadForCategoryId($category->id);
+            echo count($model) . 'posts to display';
+        }
+        
+        
         $view = new View\Template('posts');
-        if ($view->exists('posts-' . $category)) {
+        if ($view->exists('posts-' . $category->slug)) {
             $view->setTemplate('posts-' . $category);
         }
         $this->response->setBody($view->render());
