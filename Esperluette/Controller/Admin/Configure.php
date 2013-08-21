@@ -18,6 +18,10 @@ class Configure extends \Esperluette\Controller\Base
                 'site_description'              => '',
                 'language'                      => '',
                 'timezone'                      => '',
+                'date_format'                   => '',
+                'date_format_custom'            => '',
+                'time_format'                   => '',
+                'time_format_custom'            => '',
                 'admin_email'                   => '',
                 'posts_default_category'        => '',
                 'posts_per_page'                => 0,
@@ -62,7 +66,19 @@ class Configure extends \Esperluette\Controller\Base
                 ->validate('comments_autoclose_after')
                 ->digit(Helper::i18n('error.config.comments_autoclose_after_number'))
                 ->notBlank(Helper::i18n('error.config.comments_autoclose_after_empty'));
+            
+            if ($config['date_format'] == 'custom') {
+                $validator
+                    ->validate('date_format_custom')
+                    ->notBlank(Helper::i18n('error.config.date_format_empty'));
+            }
 
+            if ($config['time_format'] == 'custom') {
+                $validator
+                    ->validate('time_format_custom')
+                    ->notBlank(Helper::i18n('error.config.time_format_empty'));
+            }
+            
             if ($errors = $validator->getErrors()) {
                 Notification::write('error', $errors);
             } else {
