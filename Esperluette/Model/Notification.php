@@ -20,7 +20,7 @@ class Notification
         if (is_array($notifications)) {
             foreach ($notifications as $notificationType => $notificationMessages) {
                 foreach ($notificationMessages as $currentMessage) {
-                    $output .= '<div style="border: solid 1px red">' . implode('<br/>', (array) $currentMessage) . '</div>';;
+                    $output .= '<div class="notification ' . $notificationType . '">' . implode('<br/>', (array) $currentMessage) . '</div>';;
                 }
             }
         }

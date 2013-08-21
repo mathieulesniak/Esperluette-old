@@ -27,18 +27,18 @@ class Edit extends \Esperluette\View\Admin
         } else {
             $output  = '<h1>' . Helper::i18n('admin.categories.add') . '</h1>';
         }
-
+        $output .= '<div class="well">';
         $output .= '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post">'."\n";
-        $output .= '    <p>';
+        $output .= '    <p class="controls">';
         $output .=          FormItem::text('name', $formValues['name'], Helper::i18n('admin.categories.category_name'));
         $output .= '    </p>';
-        $output .= '    <p>';
+        $output .= '    <p class="controls">';
         $output .=          FormItem::text('slug', $formValues['slug'], Helper::i18n('admin.categories.slug'));
         $output .= '    </p>';
-        $output .= '    <p>';
+        $output .= '    <p class="controls">';
         $output .=          FormItem::textarea('description', $formValues['description'], Helper::i18n('admin.categories.description'));
         $output .= '    </p>';
-        $output .= '    <p>';
+        $output .= '    <p class="controls">';
         $categoriesList = CategoryList::loadAll()->generateTree()->getAsArray();
         array_unshift($categoriesList, Helper::i18n('admin.categories.no_parent'));
         unset($categoriesList[$this->model->id]);
@@ -51,6 +51,7 @@ class Edit extends \Esperluette\View\Admin
         $output .= '    </p>';
         $output .=      FormItem::submit('save_category', Helper::i18n('admin.categories.save'));
         $output .= '</form>';
+        $output .= '</div>';
         
         return parent::render($output);
     }

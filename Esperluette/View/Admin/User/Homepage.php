@@ -18,9 +18,10 @@ class Homepage extends \Esperluette\View\PaginatedAdmin
         $output  = '<h1>' . Helper::i18n('admin.users') . '</h1>';
 
         $output .= '<div class="action">';
-        $output .= '    <a href="' . Helper::url('/admin/users/add') . '">' . Helper::i18n('admin.users.add') . '</a>';
+        $output .= '    <a href="' . Helper::url('/admin/users/add') . '" class="btn btn-primary">' . Helper::i18n('admin.users.add') . '</a>';
         $output .= '</div>';
-        $output .= '<ul class="user-list">'."\n";
+        $output .= '<div class="well">';
+        $output .= '    <ul class="user-list">'."\n";
         foreach ($this->model as $currentUser) {
             $output .= '<li>';
             $output .= '    <div class="username">' . htmlentities($currentUser->nickname) . '</div>';
@@ -31,13 +32,14 @@ class Homepage extends \Esperluette\View\PaginatedAdmin
 
             $output .= '    <div class="post-count">' . count($currentUser->posts) . '</div>';
             $output .= '    <div class="action">';
-            $output .= '        <a href="' . Helper::url('/admin/users/edit/' . $currentUser->id) . '">' . Helper::i18n('admin.users.edit') . '</a>';
-            $output .= '        <a href="' . Helper::url('/admin/users/delete/' . $currentUser->id) . '">' . Helper::i18n('admin.users.delete') . '</a>';
+            $output .= '        <a href="' . Helper::url('/admin/users/edit/' . $currentUser->id) . '" class="btn btn-info">' . Helper::i18n('admin.users.edit') . '</a>';
+            $output .= '        <a href="' . Helper::url('/admin/users/delete/' . $currentUser->id) . '" class="btn btn-danger">' . Helper::i18n('admin.users.delete') . '</a>';
             $output .= '    </div>';
             $output .= '</li>';
         }
 
-        $output .= '</ul>'."\n";
+        $output .= '    </ul>'."\n";
+        $output .= '</div>';
 
         return parent::render($output);
     }

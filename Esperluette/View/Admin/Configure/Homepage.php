@@ -23,6 +23,10 @@ class Homepage extends \Esperluette\View\Admin
             'admin_email'                   => Fwk::Request()->getPostParam('admin_email', Config::get('admin_email')),
             'language'                      => Fwk::Request()->getPostParam('language', Config::get('language')),
             'timezone'                      => Fwk::Request()->getPostParam('timezone', Config::get('timezone')),
+            'date_format'                   => Fwk::Request()->getPostParam('date_format', Config::get('date_format')),
+            'date_format_custom'            => Fwk::Request()->getPostParam('date_format_custom', Config::get('date_format_custom', 'F j, Y')),
+            'time_format'                   => Fwk::Request()->getPostParam('time_format', Config::get('time_format')),
+            'time_format_custom'            => Fwk::Request()->getPostParam('time_format_custom', Config::get('time_format_custom', 'H:i')),
             'posts_default_category'        => Fwk::Request()->getPostParam('posts_default_category', Config::get('posts_default_category')),
             'posts_per_page'                => Fwk::Request()->getPostParam('posts_per_page', Config::get('posts_per_page')),
             'comments_enabled'              => Fwk::Request()->getPostParam('comments_enabled', Config::get('comments_enabled')),
@@ -43,14 +47,16 @@ class Homepage extends \Esperluette\View\Admin
         // Site config
         //
 
-        $output .= '<fieldset>';
-        $output .= '    <legend>' . Helper::i18n('admin.setup.site') . '</legend>';
         
-        $output .= '<p>';
-        $output .= FormItem::text('site_name', $formValues['site_name'], Helper::i18n('admin.setup.site_name'));
+        $output .= '<div class="top-bar"><h3>' . Helper::i18n('admin.setup.site') . '</h3></div>';
+        $output .= '<div class="well">';
+        // Site name
+        $output .= '<p class="controls">';
+        $output .=      FormItem::text('site_name', $formValues['site_name'], Helper::i18n('admin.setup.site_name'));
         $output .= '</p>';
 
-        $output .= '<p>';
+        // Site description
+        $output .= '<p class="controls">';
         $output .= FormItem::textarea('site_description', $formValues['site_description'], Helper::i18n('admin.setup.site_description'));
         $output .= '</p>';
         
@@ -59,49 +65,87 @@ class Homepage extends \Esperluette\View\Admin
         TODO : Front page chooser
          */ 
         
-        $output .= '    <p>' . FormItem::text('admin_email', $formValues['admin_email'], Helper::i18n('admin.setup.admin_email')) . '</p>';
-        /**
-         TODO : language chooser
-         */
+        // Admin email
+        $output .= '    <p class="controls">' . FormItem::text('admin_email', $formValues['admin_email'], Helper::i18n('admin.setup.admin_email')) . '</p>';
         
-        $output .= '    <p>' . FormItem::text('language', $formValues['language'], Helper::i18n('admin.setup.language')) . '</p>';
-        $output .= '    <p>' . FormItem::select(
+        // Language
+        $output .= '    <p class="controls">' . FormItem::select(
+            'language',
+            Helper::i18nList(),
+            $formValues['language'],
+            Helper::i18n('admin.setup.language')
+        );
+        $output .= '    </p>';
+
+        // Timezone
+        $output .= '    <p class="controls">' . FormItem::select(
             'timezone',
             Helper::listTimezones(),
             $formValues['timezone'],
             Helper::i18n('admin.setup.timezone')
             );
         $output .= '    </p>';
-        /**
-         TODO : Date format
-         TODO : Timezone
-         TODO : Time format
-         */
-        Helper::listTimezones();
 
-        $output .= '</fieldset>';
-        $output .= '<fieldset>';
-        $output .= '    <legend>' . Helper::i18n('admin.setup.posts') . '</legend>';
-        $output .= '    <p>' . FormItem::number('posts_per_page', $formValues['posts_per_page'], Helper::i18n('admin.setup.posts_per_page'), array('step' => 1, 'min' => 1)) . '</p>';
+        // Date format
+        $customLabel =  Helper::i18n('admin.setup.date_format_custom') . FormItem::text('date_format_custom', $formValues['date_format_custom']);
+        $output .= '    <p class="controls">';
+        $output .= '        ' . FormItem::radio(
+            'date_format', 
+            array(
+                'Y/m/d' => date('Y/m/d'),
+                'm/d/Y' => date('m/d/Y'),
+                'd/m/Y' => date('d/m/Y'),
+                'custom' => $customLabel
+            ),
+            $formValues['date_format'],
+            Helper::i18n('admin.setup.date_format')
+        );
+        
+        $output .= '    </p>';
+        
+        // Time format
+        $customLabel =  Helper::i18n('admin.setup.time_format_custom') . FormItem::text('time_format_custom', $formValues['time_format_custom']);
+        $output .= '    <p class="controls">';
+        $output .= '        ' . FormItem::radio(
+            'time_format', 
+            array(
+                'g:i a' => date('g:i a'),
+                'g:i A' => date('g:i A'),
+                'H:i' => date('H:i'),
+                'custom' => $customLabel
+            ),
+            $formValues['time_format'],
+            Helper::i18n('admin.setup.time_format')
+        );
+        $output .= '    </p>';
+        $output .= '</div>';
+
+        $output .= '<div class="top-bar"><h3>' . Helper::i18n('admin.setup.posts') . '</h3></div>';
+        $output .= '<div class="well">'."\n";
+        // Posts per page
+        $output .= '    <p class="controls">' . FormItem::number('posts_per_page', $formValues['posts_per_page'], Helper::i18n('admin.setup.posts_per_page'), array('step' => 1, 'min' => 1)) . '</p>';
+
+        // Default category
         $categoriesList = CategoryList::loadAll();
-        $output .= '    <p>' . FormItem::select(
+        $output .= '    <p class="controls">' . FormItem::select(
             'posts_default_category',
             $categoriesList->generateTree()->getAsArray(),
             $formValues['posts_default_category'],
             Helper::i18n('admin.setup.posts_default_category')
             ) . '</p>';
-        $output .= '</fieldset>';
+        $output .= '</div>';
         
         //
         // Comments
         //
 
-        $output .= '<fieldset>';
-        $output .= '    <legend>' . Helper::i18n('admin.setup.comments') . '</legend>';
-        $output .= '    <p>' . FormItem::checkbox('comments_enabled', 1, $formValues['comments_enabled'] == 1, Helper::i18n('admin.setup.comments_enabled')) . '</p>';
-        $output .= '    <p>' . FormItem::checkbox('comments_name_email_required', 1, $formValues['comments_name_email_required'], Helper::i18n('admin.setup.comments_name_email_required')) . '</p>';
-        $output .= '    <p>' . FormItem::number('comments_autoclose_after', $formValues['comments_autoclose_after'], Helper::i18n('admin.setup.comments_autoclose_after'), array('step' => 1, 'min' => 0)) . '</p>';
-        $output .= '<p>';
+        
+        $output .= '<div class="top-bar"><h3>' . Helper::i18n('admin.setup.comments') . '</h3></div>';
+        $output .= '<div class="well">'."\n";
+        $output .= '    <p class="controls">' . FormItem::checkbox('comments_enabled', 1, $formValues['comments_enabled'] == 1, Helper::i18n('admin.setup.comments_enabled')) . '</p>';
+        $output .= '    <p class="controls">' . FormItem::checkbox('comments_name_email_required', 1, $formValues['comments_name_email_required'], Helper::i18n('admin.setup.comments_name_email_required')) . '</p>';
+        $output .= '    <p class="controls">' . FormItem::number('comments_autoclose_after', $formValues['comments_autoclose_after'], Helper::i18n('admin.setup.comments_autoclose_after'), array('step' => 1, 'min' => 0)) . '</p>';
+        $output .= '    <p class="controls">';
         $output .= FormItem::select(
             'comments_order',
             array('ASC' => Helper::i18n('admin.setup.comments_order_asc'), 'DESC' => Helper::i18n('admin.setup.comments_order_desc')),
@@ -110,21 +154,21 @@ class Homepage extends \Esperluette\View\Admin
         );
         $output .= '</p>';
         
-        $output .= '    <p>' . FormItem::checkbox('comments_autoallow', 1, $formValues['comments_autoallow'], Helper::i18n('admin.setup.comments_autoallow')) . '</p>';
-        $output .= '    <p>' . FormItem::checkbox('comments_notify', 1, $formValues['comments_notify'], Helper::i18n('admin.setup.comments_notify')) . '</p>';
-        $output .= '    <p>' . FormItem::number('comments_hold_links_nb', $formValues['comments_hold_links_nb'], Helper::i18n('admin.setup.comments_hold_links_nb'), array('step' => 1, 'min' => 0)) . '</p>';
-        $output .= '    <p>' . FormItem::textarea('comments_wordlist_hold', $formValues['comments_wordlist_hold'], Helper::i18n('admin.setup.comments_wordlist_hold')) . '</p>';
-        $output .= '    <p>' . FormItem::textarea('comments_wordlist_spam', $formValues['comments_wordlist_spam'], Helper::i18n('admin.setup.comments_wordlist_spam')) . '</p>';
-        $output .= '</fieldset>';
+        $output .= '    <p class="controls">' . FormItem::checkbox('comments_autoallow', 1, $formValues['comments_autoallow'], Helper::i18n('admin.setup.comments_autoallow')) . '</p>';
+        $output .= '    <p class="controls">' . FormItem::checkbox('comments_notify', 1, $formValues['comments_notify'], Helper::i18n('admin.setup.comments_notify')) . '</p>';
+        $output .= '    <p class="controls">' . FormItem::number('comments_hold_links_nb', $formValues['comments_hold_links_nb'], Helper::i18n('admin.setup.comments_hold_links_nb'), array('step' => 1, 'min' => 0)) . '</p>';
+        $output .= '    <p class="controls">' . FormItem::textarea('comments_wordlist_hold', $formValues['comments_wordlist_hold'], Helper::i18n('admin.setup.comments_wordlist_hold')) . '</p>';
+        $output .= '    <p class="controls">' . FormItem::textarea('comments_wordlist_spam', $formValues['comments_wordlist_spam'], Helper::i18n('admin.setup.comments_wordlist_spam')) . '</p>';
+        $output .= '</div>';
         
         //
         // Themes
         //
         
         $themeList = new Theme\ThemeList();
-        $output .= '<fieldset>' . "\n";;
-        $output .= '    <legend>' . Helper::i18n('admin.setup.themes') . '</legend>'."\n";
-        $output .= '    <p>';
+        $output .= '<div class="top-bar"><h3>' . Helper::i18n('admin.setup.themes') . '</h3></div>'."\n";
+        $output .= '<div class="well">'."\n";
+        $output .= '    <p class="controls">';
         $output .= FormItem::select(
             'theme',
             $themeList->getAsArray(),
@@ -132,7 +176,7 @@ class Homepage extends \Esperluette\View\Admin
             Helper::i18n('admin.setup.theme')
         );
         $output .= '</p>';
-        $output .= '</fieldset>' . "\n";
+        $output .= '</div>' . "\n";
 
         $output .= FormItem::submit('save_configuration', Helper::i18n('admin.setup.save'));
         
