@@ -46,6 +46,24 @@ class Helper
         }
     }
 
+    public static function i18nList()
+    {
+        $langDir    = 'Esperluette' . DIRECTORY_SEPARATOR. 'I18n';
+        $langList   = array();
+        $iterator   = new \DirectoryIterator($langDir);
+
+        foreach ($iterator as $currentFile) {
+            if ($currentFile->isDir() 
+                && !$currentFile->isDot()
+                && is_readable($currentFile->getPathname() . DIRECTORY_SEPARATOR . 'language.php')) {
+                $langList[$currentFile->getFilename()] = $currentFile->getFilename();
+            }
+        }
+        asort($langList);
+        
+        return $langList;
+    }
+
     public static function url($url)
     {
         return Fwk::App()->getParameter('url') . $url;
