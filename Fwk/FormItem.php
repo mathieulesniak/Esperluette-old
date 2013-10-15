@@ -64,9 +64,8 @@ class FormItem
         $itemData['type']   = $type;
         $itemData['name']   = $name;
         $itemData['value']  = $value;
-        
+        $itemData['label']  = $label;
         if ($label !== null && !isset($htmlAttributes['id'])) {
-            $itemData['label']  = $label;
             $itemData['id']     = $name;
         }
         $itemData = array_merge($itemData, $htmlAttributes);
@@ -127,11 +126,40 @@ class FormItem
         return static::input('email', $name, $value, $label, $htmlAttributes);
     }
 
-    public static function radio()
+    public static function radio($name, $availableValues = array(), $value = null, $label = null, $htmlAttributes = array(), $errors = array())
     {
+        $itemData           = array();
+        $itemData['name']   = $name;
+        $itemData['value']  = $value;
+        $itemData['label']  = $label;
+        $itemData['errors'] = $errors;
+        $itemData = array_merge($itemData, $htmlAttributes);
+
+        $item = new FormItem($itemData);
+
+        $output  = $item->renderLabel();
+        $output .= '<div class="radio-list">'."\n";
+        foreach ($availableValues as $currentValue => $currentLabel) {
+            $htmlAttributes = array('id' => $name . '-' . $currentValue);
+            if ($currentValue == $value) {
+                $htmlAttributes['checked'] = 'checked';
+            }
+
+            $output .= '<div class="radio-item">' . FormItem::input('radio', $name, $currentValue, $currentLabel, $htmlAttributes) . '</div>'."\n";
+        }
+        $output .= '</div>'."\n";
+
+        return $output;
+    }
+    
+    /*public static function radio($name, $value = null, $checked = false, $label = null, $htmlAttributes = array())
+    {
+        if (!isset($htmlAttributes['checked']) && $checked) {
+            $htmlAttributes['checked'] = 'checked';
+        }
         return static::input('radio', $name, $value, $label, $htmlAttributes);
     }
-
+*/
     public static function reset($value = null, $htmlAttributes)
     {
         return static::input('reset', null, $value, $label, $htmlAttributes);
@@ -182,6 +210,9 @@ class FormItem
         $itemData['name']   = $name;
         $itemData['value']  = $value;
         $itemData['label']  = $label;
+         if ($label !== null && !isset($htmlAttributes['id'])) {
+            $itemData['id']     = $name;
+        }
         $itemData = array_merge($itemData, $htmlAttributes);
 
         $item = new FormItem($itemData);
