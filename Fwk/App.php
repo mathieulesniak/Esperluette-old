@@ -8,6 +8,7 @@ class App extends Service
     protected $parametersList   = array(
         'root',
         'mode',
-        'url'
+        'url',
+        'locale'
         );
 }
