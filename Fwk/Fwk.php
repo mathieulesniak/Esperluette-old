@@ -12,7 +12,7 @@ namespace Fwk;
 class Fwk
 {
 
-    const VERSION = '0.2';
+    const VERSION = '0.3';
 
     const CONF_DIR = '/conf/';
 
@@ -28,6 +28,7 @@ class Fwk
     private $servicesList = array(
         'Logger'            => '\Fwk\Logger',
         'App'               => '\Fwk\App',
+        'I18n'              => '\Fwk\I18n',
         'Router'            => '\Fwk\Router',
         'Request'           => '\Fwk\Request',
         'Database'          => '\Fwk\Database',
@@ -54,6 +55,9 @@ class Fwk
 
         $this->loadConfig();
 
+        // Load helpers
+        require_once __DIR__ . DIRECTORY_SEPARATOR . 'Helper.php';
+
         // Configure autoloader
         require_once __DIR__ . DIRECTORY_SEPARATOR . 'AutoLoader.php';
         AutoLoader::register();
@@ -64,6 +68,7 @@ class Fwk
         register_shutdown_function(array('\Fwk\Error', 'handleShutdownError'));
 */
         static::$servicesRepository = new Container();
+
 
         $this->initServices();
     }
@@ -77,7 +82,9 @@ class Fwk
         static::$servicesRepository->setWarehouse($this->servicesList);
 
         static::$servicesRepository['Request']->parse();
-
+        if (isset($this->config['App']['locale'])) {
+            $this->config['I18n'] = array('locale' => $this->config['App']['locale']);
+        }
         // first sync, && init, dependency to Fwk::request
         static::$servicesContainer = clone static::$servicesRepository;
 
@@ -104,29 +111,6 @@ class Fwk
         // final sync, repository is complete
         static::$servicesContainer = clone static::$servicesRepository;
     }
-/*
-    public static function getInitedServiceList()
-    {
-        return static::$servicesContainer->getServiceNameList();
-    }
-*/
-    /*
-    public static function getService($service)
-    {
-        return static::$servicesContainer[$service];
-    }
-    */
-    /**
-     * Get a new instance of a service
-     * @param  string $service  service name
-     * @return Fwk\Service      instance of requested service
-     */
-    /*
-    public static function getNewService($service)
-    {
-        return clone static::$servicesRepository[$service];
-    }
-    */
 
     private function setConfigFile($configFile)
     {
@@ -201,13 +185,18 @@ class Fwk
                 );
     }
 
-    public function run()
+    public function boot()
     {
         // Boot application, if available
         if (isset($this->config['App']['root']) 
             && is_file($this->config['App']['root'] . DIRECTORY_SEPARATOR . 'boot.php')) {
             require $this->config['App']['root'] . DIRECTORY_SEPARATOR . 'boot.php';
         }
+    }
+
+    public function run()
+    {
+        $this->boot();
         static::$servicesContainer['Router']->doRouting();
     }
 
