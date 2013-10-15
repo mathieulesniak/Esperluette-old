@@ -320,7 +320,7 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
     // Implementation of Iterator Interface
     public function current()
     {
-        return $this->items[$this->iterator_position];
+        return $this->offsetGet($this->iterator_position);
     }
 
     public function next()
@@ -403,5 +403,16 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
         foreach ($this->items as $currentItem) {
             return $currentItem;
         }
+    }
+
+    public function getRandom($nb = 1)
+    {
+        $keys = (array) array_rand($this->items, $nb);
+        $result = array();
+        foreach ($keys as $currentKey) {
+            $result[$currentKey] = $this->items[$currentKey];
+        }
+
+        return $result;
     }
 }
