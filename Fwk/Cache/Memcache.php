@@ -72,7 +72,7 @@ class Memcache extends Fwk\Cache
     private function connect()
     {
         if ($this->handler === false) {
-            if (class_exists('Memcached')) {
+            if (class_exists('Memcache')) {
                 try {
                     $this->handler = new \Memcache();
                     $this->handler->connect($this->host, $this->port);
