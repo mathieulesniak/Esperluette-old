@@ -16,6 +16,7 @@ class Validator
     private $datas;
     private $value;
     private $index;
+    private $stop = false;
 
     public function __construct($input) {
         $this->datas = $input;
@@ -173,7 +174,7 @@ class Validator
             if (is_object($this->datas) && isset($this->datas->$index)) {
                 $this->value = $this->datas->$index;
                 $this->index = $index;
-            } elseif (isset($this->datas[$index])) {
+            } elseif (array_key_exists( $index, $this->datas)) {
                 $this->value = $this->datas[$index];
                 $this->index = $index;
             } else {
@@ -186,32 +187,45 @@ class Validator
 
     public function __call($method, $parameters)
     {
-        // Negation check
-        if (substr($method, 0, 3) == 'not') {
-            $negation   = true;
-            $method     = lcFirst(substr($method, 3));
-        } else {
-            $negation = false;
-        }
-        
-        if (!isset($this->checks[$method])) {
-            throw new \BadMethodCallException('Unknown check ' . $method);
-        } else {
-            $validator = $this->checks[$method];
-        }
-
-        $errorMessage = array_pop($parameters);
-
-        array_unshift($parameters, $this->value);
-
-        $validation = (bool) (call_user_func_array($validator, $parameters) ^ $negation);
-        if (!$validation) {
-            if ($this->index === null) {
-                $this->errors[] = $errorMessage;
+        if (!$this->stop) {
+            // Stop on error, ignore others tests if fails
+            if (substr($method, 0, 4) == 'stop') {
+                $stopOnError = true;
+                $method = lcFirst(substr($method, 4));
             } else {
-                $this->errors[$this->index][] = $errorMessage;
+                $stopOnError = false;
             }
-            
+
+            // Negation check
+            if (substr(strtolower($method), 0, 3) == 'not') {
+                $negation   = true;
+                $method     = lcFirst(substr($method, 3));
+            } else {
+                $negation = false;
+            }
+
+            if (!isset($this->checks[$method])) {
+                throw new \BadMethodCallException('Unknown check ' . $method);
+            } else {
+                $validator = $this->checks[$method];
+            }
+
+            $errorMessage = array_pop($parameters);
+
+            array_unshift($parameters, $this->value);
+
+            $validation = (bool) (call_user_func_array($validator, $parameters) ^ $negation);
+            if (!$validation) {
+                if ($stopOnError) {
+                    $this->stop = true;
+                }
+                if ($this->index === null) {
+                    $this->errors[] = $errorMessage;
+                } else {
+                    $this->errors[$this->index][] = $errorMessage;
+                }
+                
+            }
         }
 
         return $this;
@@ -219,6 +233,7 @@ class Validator
 
     public function getErrors($index = null)
     {
+
         if ($index === null) {
             return $this->errors;
         } else {
