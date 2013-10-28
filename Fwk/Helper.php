@@ -175,6 +175,20 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('getPostParam')) {
+    function getPostParam($param, $defaultValue = null)
+    {
+        return Fwk::Request()->getPostParam($param, $defaultValue);
+    }
+}
+
+if (!function_exists('getParam')) {
+    function getParam($param, $defaultValue = null)
+    {
+        return Fwk::Request()->getParam($param, $defaultValue);
+    }
+}
+
 if (!function_exists('i18')) {
     function i18n() {
         return call_user_func_array(array(Fwk::I18n(), 'get'), func_get_args());
