@@ -15,11 +15,15 @@ class Image
 
     public function load($filename)
     {
-        $this->source = imagecreatefromstring(file_get_contents($filename));
-        if ($this->source !== false) {
-            $this->destination = $this->source;
-            $this->width = imagesx($this->source);
-            $this->height = imagesy($this->source);
+        if (is_file($filename)) {
+            $this->source = imagecreatefromstring(file_get_contents($filename));
+            if ($this->source !== false) {
+                $this->destination = $this->source;
+                $this->width = imagesx($this->source);
+                $this->height = imagesy($this->source);
+            }
+        } else {
+            throw new \InvalidArgumentException('Cannot load ' . $filename);
         }
         return $this;
     }
