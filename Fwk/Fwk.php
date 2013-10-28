@@ -99,8 +99,8 @@ class Fwk
             }
         }
 
-        if (isset($this->config['constants'])) {
-            foreach ($this->config['constants'] as $constantName => $constantValue) {
+        if (isset($this->config['Constants'])) {
+            foreach ($this->config['Constants'] as $constantName => $constantValue) {
                 $constantName = strtoupper($constantName);
                 define($constantName, $constantValue);
             }
