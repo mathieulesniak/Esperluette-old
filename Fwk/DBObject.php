@@ -165,6 +165,22 @@ class DBObject implements Interfaces\IDBObject
     {
         return isset($this->loadedProtectedVariables[$variable]);
     }
+
+    /**
+     * __sleep magic method, permits an inherited DBObject class to be serialized
+     * @return Array of properties to serialize
+     */
+    public function __sleep()
+    {
+        $this->dbLink = false;
+        $reflection = new \ReflectionClass($this);
+        $props   = $reflection->getProperties();
+        $result = array();
+        foreach ($props as $currentProperty) {
+            $result[] = $currentProperty->name;
+        }
+        return $result;
+    }
     
     /**
      * Load ORM from Database
