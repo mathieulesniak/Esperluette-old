@@ -3,21 +3,23 @@ namespace Fwk;
 
 class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICollection
 {
-    const TABLE_NAME            = '';   // Name of SQL table containing items
-    const ITEM_TYPE             = '';   // Class of items in collection
+    const TABLE_NAME            = '';           // Name of SQL table containing items
+    const ITEM_TYPE             = '';           // Class of items in collection
     const PARENT_ID_NAME        = 'parent_id';  // Name of the field referencing to parent_id
+    const PARENT_OBJECT_TYPE    = '';           // Parent object type
 
-    protected $parent_id;           // Id of the parent
-    protected $parent_type;
+    protected $parentId;                       // Id of the parent
+    protected $parentFilterName;                // Name of field used for filtering
+    protected $parentFilterType;                // Value of filter
 
     protected $items            = array();
     protected $mapping          = array();
 
-    private $sort_field;
-    private $sort_order;
+    private $sortField;
+    private $sortOrder;
 
-    private $item_offset        = 0;
-    private $iterator_position  = 0;
+    private $itemOffset        = 0;
+    private $iteratorPosition  = 0;
 
     /**
      * Load entire table into collection
@@ -34,17 +36,17 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
         $sql  = "SELECT *";
         $sql .= "   FROM `" . $collection::TABLE_NAME . "`";
 
-        if ($collection->parent_type !== '' && $collection->parent_type != null) {
-            $sql .= "WHERE type=:type";
-            $sqlParams['type'] = $collection->parent_type;
+        if ($collection->parentFilterType !== '' && $collection->parentFilterType != null) {
+            $sql .= "WHERE " . $collection->parentFilterName . "=:type";
+            $sqlParams['type'] = $collection->parentFilterType;
         }
 
         $results = Fwk::Database()->query($sql, $sqlParams)->fetchAll();
 
         if ($results !== false) {
             foreach ($results as $currentResult) {
-                $item_name = $collection::ITEM_TYPE;
-                $collection->addItem($item_name::buildFromArray($currentResult));
+                $itemName = $collection::ITEM_TYPE;
+                $collection->addItem($itemName::buildFromArray($currentResult));
             }
         }
 
@@ -59,8 +61,8 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
      */
     public static function buildFromSql($sql, $sqlParams = array())
     {
-        $called_class = get_called_class();
-        $collection = new $called_class;
+        $calledClass = get_called_class();
+        $collection = new $calledClass;
 
         $collection->loadFromSql($sql, $sqlParams);
 
@@ -73,8 +75,8 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
 
         if ($results !== false) {
             foreach ($results as $currentResult) {
-                $item_name = $this::ITEM_TYPE;
-                $this->addItem($item_name::buildFromArray($currentResult));
+                $itemName = $this::ITEM_TYPE;
+                $this->addItem($itemName::buildFromArray($currentResult));
             }
         }
 
@@ -83,7 +85,9 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
 
     public function lazyLoadFromSql($sql, $sqlParams = array())
     {
-        $results = Fwk::Database()->query($sql, $sqlParams)->fetchAll();
+        $results = Fwk::Database()
+            ->query($sql, $sqlParams)
+            ->fetchAll();
 
         if ($results !== false) {
             foreach ($results as $currentResult) {
@@ -94,81 +98,101 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
         return $this;
     }
 
-    public static function loadForParentId($parent_id)
+    public static function loadForParentId($parentId)
     {
-        $called_class   = get_called_class();
-        $collection     = new $called_class;
+        $calledClass   = get_called_class();
+        $collection     = new $calledClass;
 
-        if ($parent_id != '') {
-            $sql_params     = array();
-            $db_handler     = Fwk::Database(true);
+        if ($parentId != '') {
+            $sqlParams     = array();
+            $dbHandler     = Fwk::Database(true);
 
             $sql  = "SELECT *";
             $sql .= " FROM `" . $collection::TABLE_NAME . "`";
             $sql .= " WHERE";
             $sql .= "   " . $collection::PARENT_ID_NAME . "=:parent_id";
 
-            if ($collection->parent_type !== null) {
-                $sql .= "   AND type=:parent_type";
-                $sql_params['parent_type'] = $collection->parent_type;
+            if ($collection->parentFilterType !== null) {
+                $sql .= "   AND " . $collection->parentFilterName . "=:parent_type";
+                $sqlParams['parent_type'] = $collection->parentFilterType;
             }
 
-            $sql_params['parent_id'] = $parent_id;
-            $results = $db_handler->query($sql, $sql_params)->fetchAll();
+            $sqlParams['parent_id'] = $parentId;
+            $results = $dbHandler->query($sql, $sqlParams)->fetchAll();
 
             if ($results !== false) {
                 foreach ($results as $currentResult) {
-                    $item_name = $collection::ITEM_TYPE;
-                    $collection->addItem($item_name::buildFromArray($currentResult));
+                    $itemName = $collection::ITEM_TYPE;
+                    $collection->addItem($itemName::buildFromArray($currentResult));
                 }
             }
 
-            $collection->parent_id = $parent_id;
+            $collection->parentId = $parentId;
         }
 
         return $collection;
     }
 
-    public function setParentIdForAll($parent_id)
+    public function setParentIdForAll($parentId)
     {
-        $this->parent_id = $parent_id;
-        foreach ($this->items as $key => $current_item) {
-            $this->items[$key]->{static::PARENT_ID_NAME} = $parent_id;
+        $this->parentId = $parentId;
+        foreach ($this->items as $key => $currentItem) {
+            $this->items[$key]->{static::PARENT_ID_NAME} = $parentId;
         }
     }
 
-    public function craftItem($item_data)
+    /**
+     * Load Parent Item, if item type is defined
+     * @return item type Parent Object
+     */
+    public function loadParent()
     {
-        $item_name = static::ITEM_TYPE;
+        if (static::PARENT_OBJECT_TYPE != '' && $this->parentId != '') {
+            $parentObjectType = static::PARENT_OBJECT_TYPE;
+            $parent = new $parentObjectType();
+            if (method_exists($parent, 'load')) {
+                $parent->load($this->parentId);
 
-        foreach ($item_data as $data) {
-            $new_item = new $item_name();
-            $new_item->{static::PARENT_ID_NAME} = $this->parent_id;
-            $has_data = false;
+                return $parent;
+            } else {
+                throw new \BadMethodCallException("Parent object does not have a load(\$id) method");
+            }
+        } else {
+            throw new \BadMethodCallException("PARENT_OBJECT_TYPE is not defined");
+        }
+    }
+
+    public function craftItem($itemData)
+    {
+        $itemName = static::ITEM_TYPE;
+
+        foreach ($itemData as $data) {
+            $newItem = new $itemName();
+            $newItem->{static::PARENT_ID_NAME} = $this->parentId;
+            $hasData = false;
             foreach ($data as $field => $value) {
-                $new_item->$field = $value;
+                $newItem->$field = $value;
                 if ($value != '') {
-                    $has_data = true;
+                    $hasData = true;
                 }
             }
 
             // Only add item if there's data inside
-            if ($has_data) {
-                $this->addItem($new_item);
+            if ($hasData) {
+                $this->addItem($newItem);
             }
         }
-
     }
 
     public function save()
     {
-        // 1st step : delete all records for current parent_id
+        // 1st step : delete all records for current parentId
         $sql  = "DELETE FROM `" . static::TABLE_NAME . "`";
         if (static::PARENT_ID_NAME != '') {
             $sql .= " WHERE";
             $sql .= "   " . static::PARENT_ID_NAME . "=:parent_id";
 
-            $sqlParams = array('parent_id' => $this->parent_id);
+            $sqlParams = array('parent_id' => $this->parentId);
         } else {
             $sqlParams = array();
         }
@@ -176,8 +200,8 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
         Fwk::Database()->query($sql, $sqlParams);
 
         // 2nd step : save all current items
-        foreach ($this->items as $current_item) {
-            $current_item->save(true); // Force insert
+        foreach ($this->items as $currentItem) {
+            $currentItem->save(true); // Force insert
         }
     }
 
@@ -185,14 +209,14 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
     {
         $this->items        = array();
         $this->mapping      = array();
-        $this->item_offset  = 0;
+        $this->itemOffset   = 0;
     }
 
 
     public function sort($field, $order)
     {
-        $this->sort_field   = $field;
-        $this->sort_order   = $order;
+        $this->sortField   = $field;
+        $this->sortOrder   = $order;
 
         uasort($this->items, array($this, 'sortFunction'));
 
@@ -207,17 +231,17 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
 
         if ($withMapping) {
             $class = $this::ITEM_TYPE;
-            $dummy_item = new $class();
-            $mapping_key = $dummy_item::TABLE_INDEX;
+            $dummyItem = new $class();
+            $mappingKey = $dummyItem::TABLE_INDEX;
         }
         $values = array();
         foreach ($this->items as $key => $item) {
-            $item_values = array();
+            $itemValues = array();
             foreach ($args['data'] as $arg) {
-                $item_values[] = $item->$arg;
+                $itemValues[] = $item->$arg;
             }
-            $array_key = ( $withMapping ) ? $item->$mapping_key: $key;
-            $values[$array_key] = vsprintf($args['format'], $item_values);
+            $array_key = ( $withMapping ) ? $item->$mappingKey: $key;
+            $values[$arrayKey] = vsprintf($args['format'], $itemValues);
         }
 
         return $values;
@@ -253,39 +277,39 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
 
     private function sortFunction($a, $b)
     {
-        $first  = $this->cleanStr($a->{$this->sort_field});
-        $second = $this->cleanStr($b->{$this->sort_field});
+        $first  = $this->cleanStr($a->{$this->sortField});
+        $second = $this->cleanStr($b->{$this->sortField});
 
         if ($first === $second) {
             return 0;
         }
 
-        if ($this->sort_order == self::SORT_ASC) {
+        if ($this->sortOrder == self::SORT_ASC) {
             return ($first < $second) ? -1 : +1;
         } else {
             return ($first < $second) ? +1 : -1;
         }
     }
 
-    public function addItemLink($link_id)
+    public function addItemLink($linkId)
     {
-        $this->items[$this->item_offset] = $link_id;
+        $this->items[$this->itemOffset] = $linkId;
         // add mapping between item->index and $position in items pool
-        $this->mapping[$this->item_offset] = $link_id;
+        $this->mapping[$this->itemOffset] = $linkId;
 
-        $this->item_offset++;
+        $this->itemOffset++;
     }
 
     public function addItem(DBObject $item)
     {
         $key = $item::TABLE_INDEX;
         // Add item to items pool
-        $this->items[$this->item_offset] = $item;
+        $this->items[$this->itemOffset] = $item;
 
         // add mapping between item->index and $position in items pool
-        $this->mapping[$this->item_offset] = $item->$key;
+        $this->mapping[$this->itemOffset] = $item->$key;
 
-        $this->item_offset++;
+        $this->itemOffset++;
     }
 
     public function getItemsType()
@@ -297,9 +321,10 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
     {
         return static::PARENT_ID_NAME;
     }
+
     public function getParentId()
     {
-        return $this->parent_id;
+        return $this->parentId;
     }
 
     public function getItemFromKey($key)
@@ -320,27 +345,27 @@ class Collection implements  \Iterator, \Countable, \ArrayAccess, Interfaces\ICo
     // Implementation of Iterator Interface
     public function current()
     {
-        return $this->offsetGet($this->iterator_position);
+        return $this->offsetGet($this->iteratorPosition);
     }
 
     public function next()
     {
-        ++$this->iterator_position;
+        ++$this->iteratorPosition;
     }
 
     public function key()
     {
-        return $this->iterator_position;
+        return $this->iteratorPosition;
     }
 
     public function valid()
     {
-        return isset($this->items[$this->iterator_position]);
+        return isset($this->items[$this->iteratorPosition]);
     }
 
     public function rewind()
     {
-        $this->iterator_position = 0;
+        $this->iteratorPosition = 0;
     }
 
     // Implementation of ArrayAccess Interface
